@@ -61,6 +61,7 @@ $status_icon  = ['menunggu'=>'clock','diproses'=>'arrow-repeat','selesai'=>'chec
 
 <nav class="topnav">
     <a href="#" class="brand"> LaundryR</a>
+    <a href="#" class="brand"> LaundryR</a>
     <div class="d-flex align-items-center gap-3">
         <span class="user"><i class="bi bi-person-circle me-1"></i><?= htmlspecialchars($_SESSION['pelanggan_nama']) ?></span>
         <a href="/laundryr/logout_pelanggan.php" class="btn btn-sm text-white" style="background:rgba(255,255,255,.2);border-radius:8px;font-size:.8rem">

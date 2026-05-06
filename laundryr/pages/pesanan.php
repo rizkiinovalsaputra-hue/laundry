@@ -1,6 +1,7 @@
 <?php
 require_once '../config/db.php';
 isLogin();
+if ($_SESSION['user_role'] === 'owner') { header("Location: /laundryr/pages/laporan.php"); exit; }
 
 $msg = '';
 

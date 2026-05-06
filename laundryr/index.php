@@ -60,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="login-card">
         <div class="text-center mb-4">
             <h5 class="fw-bold mb-1" style="color:#1e293b">LaundryR</h5>
-            <div class="badge-role mt-1"><i class="bi bi-shield-lock-fill"></i> Login Staff / Admin</div>
+            <div class="badge-role mt-1"><i class="bi bi-shield-lock-fill"></i> Login</div>
         </div>
 
         <?php if ($error): ?>
@@ -74,7 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <label class="form-label">Username</label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="bi bi-person text-muted"></i></span>
-                    <input type="text" name="username" class="form-control" placeholder="Username staff" required autofocus>
+                    <input type="text" name="username" class="form-control" placeholder="Username" required autofocus>
                 </div>
             </div>
             <div class="mb-4">

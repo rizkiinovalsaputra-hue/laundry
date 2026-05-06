@@ -10,6 +10,26 @@ $base = $is_pages ? '/laundryr' : '/laundryr';
     </div>
     <nav class="sidebar-nav">
         <div class="nav-label">Menu</div>
+        <?php if ($_SESSION['user_role'] === 'owner'): ?>
+        <a href="<?= $base ?>/pages/owner_dashboard.php" class="nav-link <?= $page==='owner_dashboard.php'?'active':'' ?>">
+            <i class="bi bi-speedometer2"></i> Dashboard
+        </a>
+        <a href="<?= $base ?>/pages/users.php" class="nav-link <?= $page==='users.php'?'active':'' ?>">
+            <i class="bi bi-people"></i> Users
+        </a>
+        <a href="<?= $base ?>/pages/outlet.php" class="nav-link <?= $page==='outlet.php'?'active':'' ?>">
+            <i class="bi bi-shop"></i> Outlet
+        </a>
+        <a href="<?= $base ?>/pages/member.php" class="nav-link <?= $page==='member.php'?'active':'' ?>">
+            <i class="bi bi-person-badge"></i> Member
+        </a>
+        <a href="<?= $base ?>/pages/paket.php" class="nav-link <?= $page==='paket.php'?'active':'' ?>">
+            <i class="bi bi-box"></i> Paket
+        </a>
+        <a href="<?= $base ?>/pages/transaksi.php" class="nav-link <?= $page==='transaksi.php'?'active':'' ?>">
+            <i class="bi bi-receipt"></i> Transaksi
+        </a>
+        <?php else: ?>
         <a href="<?= $base ?>/dashboard.php" class="nav-link <?= $page==='dashboard.php'?'active':'' ?>">
             <i class="bi bi-speedometer2"></i> Dashboard
         </a>
@@ -24,16 +44,13 @@ $base = $is_pages ? '/laundryr' : '/laundryr';
         <a href="<?= $base ?>/pages/member.php" class="nav-link <?= $page==='member.php'?'active':'' ?>">
             <i class="bi bi-person-badge"></i> Member
         </a>
-        <a href="<?= $base ?>/pages/pesanan.php" class="nav-link <?= $page==='pesanan.php'?'active':'' ?>">
-            <i class="bi bi-basket2"></i> Pesanan
-            <?php
-            $db_tmp = new mysqli('localhost','root','','R_laundry');
-            $n = $db_tmp->query("SELECT COUNT(*) as c FROM pesanan WHERE status='menunggu'")->fetch_assoc()['c'];
-            $db_tmp->close();
-            if ($n > 0): ?>
-            <span class="badge bg-danger ms-auto" style="font-size:.65rem"><?= $n ?></span>
-            <?php endif; ?>
+        <a href="<?= $base ?>/pages/paket.php" class="nav-link <?= $page==='paket.php'?'active':'' ?>">
+            <i class="bi bi-box"></i> Paket
         </a>
+        <a href="<?= $base ?>/pages/transaksi.php" class="nav-link <?= $page==='transaksi.php'?'active':'' ?>">
+            <i class="bi bi-receipt"></i> Transaksi
+        </a>
+        <?php endif; ?>
     </nav>
     <div class="sidebar-footer">
         <div class="user-info d-flex align-items-center gap-2">

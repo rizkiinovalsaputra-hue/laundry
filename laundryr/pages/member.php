@@ -1,10 +1,11 @@
 <?php
 require_once '../config/db.php';
 isLogin();
+$is_owner = $_SESSION['user_role'] === 'owner';
 
 $msg = '';
 
-if (isset($_POST['tambah'])) {
+if (!$is_owner && isset($_POST['tambah'])) {
     $nama    = $conn->real_escape_string($_POST['nama']);
     $telepon = $conn->real_escape_string($_POST['telepon']);
     $alamat  = $conn->real_escape_string($_POST['alamat']);
@@ -13,7 +14,7 @@ if (isset($_POST['tambah'])) {
     $msg = ['type'=>'success','text'=>'Member berhasil ditambahkan.'];
 }
 
-if (isset($_POST['edit'])) {
+if (!$is_owner && isset($_POST['edit'])) {
     $id      = (int)$_POST['id'];
     $nama    = $conn->real_escape_string($_POST['nama']);
     $telepon = $conn->real_escape_string($_POST['telepon']);
@@ -23,7 +24,7 @@ if (isset($_POST['edit'])) {
     $msg = ['type'=>'success','text'=>'Member berhasil diupdate.'];
 }
 
-if (isset($_GET['hapus'])) {
+if (!$is_owner && isset($_GET['hapus'])) {
     $id = (int)$_GET['hapus'];
     $conn->query("DELETE FROM member WHERE id=$id");
     $msg = ['type'=>'warning','text'=>'Member berhasil dihapus.'];
@@ -60,11 +61,13 @@ while ($o = $outlets->fetch_assoc()) $outlet_list[] = $o;
         <div class="page-header">
             <div>
                 <h5>Daftar Member</h5>
-                <p>Kelola data pelanggan member</p>
+                <p>Data pelanggan member</p>
             </div>
+            <?php if (!$is_owner): ?>
             <button class="btn btn-warning btn-sm px-3 text-dark" data-bs-toggle="modal" data-bs-target="#modalTambah">
                 <i class="bi bi-plus-lg me-1"></i> Tambah Member
             </button>
+            <?php endif; ?>
         </div>
         <div class="card card-table">
             <div class="card-body p-0">
@@ -106,12 +109,16 @@ while ($o = $outlets->fetch_assoc()) $outlet_list[] = $o;
                             </td>
                             <td class="text-muted small"><?= date('d M Y', strtotime($row['created_at'])) ?></td>
                             <td>
+                                <?php if (!$is_owner): ?>
                                 <button class="btn btn-sm btn-outline-warning me-1" onclick="editMember(<?= htmlspecialchars(json_encode($row)) ?>)" title="Edit">
                                     <i class="bi bi-pencil"></i>
                                 </button>
                                 <a href="?hapus=<?= $row['id'] ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Hapus member ini?')" title="Hapus">
                                     <i class="bi bi-trash"></i>
                                 </a>
+                                <?php else: ?>
+                                <span class="text-muted small">-</span>
+                                <?php endif; ?>
                             </td>
                         </tr>
                     <?php endwhile; ?>

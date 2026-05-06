@@ -1,10 +1,13 @@
 <?php
 require_once '../config/db.php';
 isLogin();
+$is_owner = $_SESSION['user_role'] === 'owner';
+$is_kasir = $_SESSION['user_role'] === 'kasir';
 
 $msg = '';
 
-if (isset($_POST['tambah'])) {
+// Hanya admin yang bisa tambah/edit/hapus outlet
+if ($_SESSION['user_role'] === 'admin' && isset($_POST['tambah'])) {
     $nama    = $conn->real_escape_string($_POST['nama_outlet']);
     $alamat  = $conn->real_escape_string($_POST['alamat']);
     $telepon = $conn->real_escape_string($_POST['telepon']);
@@ -12,7 +15,7 @@ if (isset($_POST['tambah'])) {
     $msg = ['type'=>'success','text'=>'Outlet berhasil ditambahkan.'];
 }
 
-if (isset($_POST['edit'])) {
+if ($_SESSION['user_role'] === 'admin' && isset($_POST['edit'])) {
     $id      = (int)$_POST['id'];
     $nama    = $conn->real_escape_string($_POST['nama_outlet']);
     $alamat  = $conn->real_escape_string($_POST['alamat']);
@@ -21,7 +24,7 @@ if (isset($_POST['edit'])) {
     $msg = ['type'=>'success','text'=>'Outlet berhasil diupdate.'];
 }
 
-if (isset($_GET['hapus'])) {
+if ($_SESSION['user_role'] === 'admin' && isset($_GET['hapus'])) {
     $id = (int)$_GET['hapus'];
     $conn->query("DELETE FROM outlet WHERE id=$id");
     $msg = ['type'=>'warning','text'=>'Outlet berhasil dihapus.'];
@@ -55,11 +58,13 @@ $outlets = $conn->query("SELECT * FROM outlet ORDER BY id DESC");
         <div class="page-header">
             <div>
                 <h5>Daftar Outlet</h5>
-                <p>Kelola data outlet laundry</p>
+                <p>Data outlet laundry <?= $is_kasir ? '(View Only)' : '' ?></p>
             </div>
+            <?php if ($_SESSION['user_role'] === 'admin'): ?>
             <button class="btn btn-success btn-sm px-3" data-bs-toggle="modal" data-bs-target="#modalTambah">
                 <i class="bi bi-plus-lg me-1"></i> Tambah Outlet
             </button>
+            <?php endif; ?>
         </div>
         <div class="card card-table">
             <div class="card-body p-0">
@@ -91,12 +96,16 @@ $outlets = $conn->query("SELECT * FROM outlet ORDER BY id DESC");
                             <td><?= htmlspecialchars($row['telepon']) ?: '-' ?></td>
                             <td class="text-muted small"><?= date('d M Y', strtotime($row['created_at'])) ?></td>
                             <td>
+                                <?php if ($_SESSION['user_role'] === 'admin'): ?>
                                 <button class="btn btn-sm btn-outline-warning me-1" onclick="editOutlet(<?= htmlspecialchars(json_encode($row)) ?>)" title="Edit">
                                     <i class="bi bi-pencil"></i>
                                 </button>
                                 <a href="?hapus=<?= $row['id'] ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Hapus outlet ini?')" title="Hapus">
                                     <i class="bi bi-trash"></i>
                                 </a>
+                                <?php else: ?>
+                                <span class="text-muted small">View Only</span>
+                                <?php endif; ?>
                             </td>
                         </tr>
                     <?php endwhile; ?>

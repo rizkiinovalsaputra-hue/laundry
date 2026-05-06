@@ -1,34 +1,9 @@
-CREATE DATABASE IF NOT EXISTS R_laundry;
-USE R_laundry;
+<?php
+// Script untuk memastikan tabel ada
+require_once '../config/db.php';
 
-CREATE TABLE IF NOT EXISTS users (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    nama VARCHAR(100) NOT NULL,
-    username VARCHAR(50) NOT NULL UNIQUE,
-    password VARCHAR(255) NOT NULL,
-    role ENUM('admin','kasir') DEFAULT 'kasir',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TABLE IF NOT EXISTS outlet (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    nama_outlet VARCHAR(100) NOT NULL,
-    alamat TEXT,
-    telepon VARCHAR(20),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TABLE IF NOT EXISTS member (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    nama VARCHAR(100) NOT NULL,
-    telepon VARCHAR(20),
-    alamat TEXT,
-    outlet_id INT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (outlet_id) REFERENCES outlet(id) ON DELETE SET NULL
-);
-
-CREATE TABLE IF NOT EXISTS tb_paket (
+// Create tb_paket table if not exists
+$sql_paket = "CREATE TABLE IF NOT EXISTS tb_paket (
     id INT AUTO_INCREMENT PRIMARY KEY,
     outlet_id INT NOT NULL,
     jenis ENUM('kiloan','selimut','bed_cover','kaos','lain') NOT NULL,
@@ -36,9 +11,10 @@ CREATE TABLE IF NOT EXISTS tb_paket (
     harga DECIMAL(10,2) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (outlet_id) REFERENCES outlet(id) ON DELETE CASCADE
-);
+)";
 
-CREATE TABLE IF NOT EXISTS tb_transaksi (
+// Create tb_transaksi table if not exists
+$sql_transaksi = "CREATE TABLE IF NOT EXISTS tb_transaksi (
     id INT AUTO_INCREMENT PRIMARY KEY,
     outlet_id INT NOT NULL,
     kode_invoice VARCHAR(100) NOT NULL UNIQUE,
@@ -56,9 +32,10 @@ CREATE TABLE IF NOT EXISTS tb_transaksi (
     FOREIGN KEY (outlet_id) REFERENCES outlet(id) ON DELETE CASCADE,
     FOREIGN KEY (member_id) REFERENCES member(id) ON DELETE SET NULL,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-);
+)";
 
-CREATE TABLE IF NOT EXISTS tb_detail_transaksi (
+// Create tb_detail_transaksi table if not exists
+$sql_detail = "CREATE TABLE IF NOT EXISTS tb_detail_transaksi (
     id INT AUTO_INCREMENT PRIMARY KEY,
     transaksi_id INT NOT NULL,
     paket_id INT NOT NULL,
@@ -67,6 +44,12 @@ CREATE TABLE IF NOT EXISTS tb_detail_transaksi (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (transaksi_id) REFERENCES tb_transaksi(id) ON DELETE CASCADE,
     FOREIGN KEY (paket_id) REFERENCES tb_paket(id) ON DELETE CASCADE
-);
+)";
 
-INSERT INTO users (nama, username, password, role) VALUES ('Administrator', 'admin', MD5('admin123'), 'admin');
+// Execute queries
+$conn->query($sql_paket);
+$conn->query($sql_transaksi);
+$conn->query($sql_detail);
+
+echo "Tabel berhasil dibuat/diperbarui!";
+?>

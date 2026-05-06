@@ -2,13 +2,14 @@
 require_once '../config/db.php';
 isLogin();
 
-if ($_SESSION['user_role'] !== 'admin') {
+if (!in_array($_SESSION['user_role'], ['owner','admin'])) {
     header("Location: /laundryr/dashboard.php"); exit;
 }
+$is_owner = $_SESSION['user_role'] === 'owner';
 
 $msg = '';
 
-if (isset($_POST['tambah'])) {
+if (!$is_owner && isset($_POST['tambah'])) {
     $nama     = $conn->real_escape_string($_POST['nama']);
     $username = $conn->real_escape_string($_POST['username']);
     $password = md5($_POST['password']);
@@ -17,7 +18,7 @@ if (isset($_POST['tambah'])) {
     $msg = ['type'=>'success','text'=>'User berhasil ditambahkan.'];
 }
 
-if (isset($_POST['edit'])) {
+if (!$is_owner && isset($_POST['edit'])) {
     $id       = (int)$_POST['id'];
     $nama     = $conn->real_escape_string($_POST['nama']);
     $username = $conn->real_escape_string($_POST['username']);
@@ -28,7 +29,7 @@ if (isset($_POST['edit'])) {
     $msg = ['type'=>'success','text'=>'User berhasil diupdate.'];
 }
 
-if (isset($_GET['hapus'])) {
+if (!$is_owner && isset($_GET['hapus'])) {
     $id = (int)$_GET['hapus'];
     $conn->query("DELETE FROM users WHERE id=$id");
     $msg = ['type'=>'warning','text'=>'User berhasil dihapus.'];
@@ -64,9 +65,11 @@ $users = $conn->query("SELECT * FROM users ORDER BY id DESC");
                 <h5>Daftar Users</h5>
                 <p>Kelola akun pengguna sistem</p>
             </div>
+            <?php if (!$is_owner): ?>
             <button class="btn btn-primary btn-sm px-3" data-bs-toggle="modal" data-bs-target="#modalTambah">
                 <i class="bi bi-plus-lg me-1"></i> Tambah User
             </button>
+            <?php endif; ?>
         </div>
         <div class="card card-table">
             <div class="card-body p-0">
@@ -88,7 +91,7 @@ $users = $conn->query("SELECT * FROM users ORDER BY id DESC");
                             <td>
                                 <div class="d-flex align-items-center gap-2">
                                     <div class="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold"
-                                         style="width:32px;height:32px;font-size:.75rem;background:<?= $row['role']==='admin'?'#2563eb':'#64748b' ?>">
+                                         style="width:32px;height:32px;font-size:.75rem;background:<?= $row['role']==='owner'?'#7c3aed':($row['role']==='admin'?'#2563eb':'#64748b') ?>">
                                         <?= strtoupper(substr($row['nama'],0,1)) ?>
                                     </div>
                                     <?= htmlspecialchars($row['nama']) ?>
@@ -96,18 +99,22 @@ $users = $conn->query("SELECT * FROM users ORDER BY id DESC");
                             </td>
                             <td><code class="text-primary"><?= htmlspecialchars($row['username']) ?></code></td>
                             <td>
-                                <span class="badge" style="background:<?= $row['role']==='admin'?'#ede9fe;color:#7c3aed':'#f1f5f9;color:#64748b' ?>">
+                                <span class="badge" style="background:<?= $row['role']==='owner'?'#f3e8ff;color:#7c3aed':($row['role']==='admin'?'#dbeafe;color:#2563eb':'#f1f5f9;color:#64748b') ?>">
                                     <?= ucfirst($row['role']) ?>
                                 </span>
                             </td>
                             <td class="text-muted small"><?= date('d M Y', strtotime($row['created_at'])) ?></td>
                             <td>
+                                <?php if (!$is_owner): ?>
                                 <button class="btn btn-sm btn-outline-warning me-1" onclick="editUser(<?= htmlspecialchars(json_encode($row)) ?>)" title="Edit">
                                     <i class="bi bi-pencil"></i>
                                 </button>
                                 <a href="?hapus=<?= $row['id'] ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Hapus user ini?')" title="Hapus">
                                     <i class="bi bi-trash"></i>
                                 </a>
+                                <?php else: ?>
+                                <span class="text-muted small">-</span>
+                                <?php endif; ?>
                             </td>
                         </tr>
                     <?php endwhile; ?>
@@ -134,6 +141,7 @@ $users = $conn->query("SELECT * FROM users ORDER BY id DESC");
                     <select name="role" class="form-select">
                         <option value="kasir">Kasir</option>
                         <option value="admin">Admin</option>
+                        <option value="owner">Owner</option>
                     </select>
                 </div>
             </div>
@@ -165,6 +173,7 @@ $users = $conn->query("SELECT * FROM users ORDER BY id DESC");
                     <select name="role" id="edit_role" class="form-select">
                         <option value="kasir">Kasir</option>
                         <option value="admin">Admin</option>
+                        <option value="owner">Owner</option>
                     </select>
                 </div>
             </div>
